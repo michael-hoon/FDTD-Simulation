@@ -6,6 +6,7 @@ Usage:
 from docopt import docopt;
 import numpy as np;
 from time import sleep;
+from Epsilon import Epsil2D, Object, Diag2D
 
 opts = docopt(__doc__,help=True);
 outname = opts['<output>']
@@ -67,6 +68,9 @@ B=dict();
 B['x'] = np.zeros(sh);
 B['y'] = np.zeros(sh);
 B['z'] = np.zeros(sh);
+epsil1 = Epsil2D(sh)
+epsil1.add_object(Diag2D("diag1", 1000000, sh, 0.2, (0.5,0.5), topleft = True))
+epsil1.show()
 
 def destr(d, *l):
     '''destructure a dict'''
@@ -184,7 +188,7 @@ def abc(F,nF,axis,i0,i1,dx):
         F[k][I0] = F[k][I1] + (c*dt - dx)/(c*dt + dx)*(nF[k][I1] - nF[k][I0]);
     return;
 
-doplot = True;
+doplot = False;
 outfmt = '{:04}EM';
 acc = [];
 def output(t):
@@ -206,13 +210,13 @@ for i,t in enumerate(xarange(start_t,end_t,dt)):
     #maxwell's correction to ampere
     E['z'][ 1:-1, 1:-1] += (                                        \
         +(B['y'][ 1:-1, 1:-1] - B['y'][ 1:-1,  :-2])*dus[1]         \
-        -(B['x'][ 1:-1, 1:-1] - B['x'][  :-2, 1:-1])*dus[0]);
-    E['y'][  :  , 1:-1] += -((B['z'][  :  , 1:-1]-B['z'][  :  ,  :-2])*dus[1])
-    E['x'][ 1:-1,  :  ] +=  ((B['z'][ 1:-1,  :  ]-B['z'][  :-2,  :  ])*dus[0])
+        -(B['x'][ 1:-1, 1:-1] - B['x'][  :-2, 1:-1])*dus[0]) * epsil1.epsil[ 1:-1, 1:-1];
+    E['y'][  :  , 1:-1] += -((B['z'][  :  , 1:-1]-B['z'][  :  ,  :-2])*dus[1]) * epsil1.epsil[:, 1:-1]
+    E['x'][ 1:-1,  :  ] +=  ((B['z'][ 1:-1,  :  ]-B['z'][  :-2,  :  ])*dus[0]) * epsil1.epsil[ 1:-1,:]
 
     #E boundary condition
     current_edge = sincol2d(t,width,sindat);
-    print(f"...max edge -> {current_edge.max()}");
+    # print(f"...max edge -> {current_edge.max()}");
     E['y'][ :, 0] = current_edge;
     E['y'][ :,-1] = 0;
     
@@ -223,25 +227,24 @@ for i,t in enumerate(xarange(start_t,end_t,dt)):
     #maxwell, faraday
     B['z'][  :-1,  :-1] -= (
         +(E['y'][  :-1, 1:  ] - E['y'][  :-1,  :-1])*dus[1]
-        -(E['x'][ 1:  ,  :-1] - E['x'][  :-1,  :-1])*dus[0]);
-    B['y'][  :  ,  :-1] -= ((E['z'][  :  , 1:  ]-E['z'][  :  ,  :-1])*dus[0]);
-    B['x'][  :-1,  :  ] -= ((E['z'][ 1:  ,  :  ]-E['z'][  :-1,  :  ])*dus[1]);
+        -(E['x'][ 1:  ,  :-1] - E['x'][  :-1,  :-1])*dus[0]) * epsil1.epsil[  :-1,  :-1];
+    B['y'][  :  ,  :-1] -= ((E['z'][  :  , 1:  ]-E['z'][  :  ,  :-1])*dus[0]) * epsil1.epsil[  :  ,  :-1];
+    B['x'][  :-1,  :  ] -= ((E['z'][ 1:  ,  :  ]-E['z'][  :-1,  :  ])*dus[1]) * epsil1.epsil[  :-1,  :  ];
     #implicitly left to zero
 
     if i in outputs:
         output(t);
         if doplot: plot();
 pass
-plt.show()
-# print(f"outputting to {outname}");
-# out = dict();
-# fst = acc[0];
-# for dim in 'xyz':
-#    out[f'E{dim}'] = np.array([d[f'E{dim}'] for d in acc]);
-#    out[f'B{dim}'] = np.array([d[f'B{dim}'] for d in acc]);
-# out['t'] = np.array([d['t'] for d in acc]);
-# out['ys'],out['xs']  =  posx;
+print(f"outputting to {outname}");
+out = dict();
+fst = acc[0];
+for dim in 'xyz':
+   out[f'E{dim}'] = np.array([d[f'E{dim}'] for d in acc]);
+   out[f'B{dim}'] = np.array([d[f'B{dim}'] for d in acc]);
+out['t'] = np.array([d['t'] for d in acc]);
+out['ys'],out['xs']  =  posx;
 
-# out['yhs'],out['xhs'] = posxh;
-# out['lm']  = lm;
-# np.savez(outname,**out);
+out['yhs'],out['xhs'] = posxh;
+out['lm']  = lm;
+np.savez(outname,**out);

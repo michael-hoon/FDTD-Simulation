@@ -11,7 +11,7 @@ class Epsil2D():
         #Takes in shape(dimens) of grid and background epsil value (air)
         self._objects = {}
         self.bgep = 1
-        self.epsil = np.full(sh, self.bgep) 
+        self.epsil = np.full(sh, self.bgep, dtype = float) 
 
     @property
     def objects(self):
@@ -53,7 +53,7 @@ class Epsil2D():
 
 
 class Object():
-    def __init__(self, ep, sh, exceed = False):
+    def __init__(self, name, ep, sh, exceed = False):
         #initialise with epsil value for object and a grid with same shape as background
         #Child classes will override, calls super().__init__, store additional arguments and call _set_pos with those args
         #Additional args will be dimensions of object with values btwn 0 and 1
@@ -61,6 +61,7 @@ class Object():
         self.ep = ep
         self.pos = np.zeros(sh, dtype = bool)
         self.exceed = exceed
+        self.name = name
 
     def _set_pos(self):
         #To be called in __init__ in child classes
@@ -102,11 +103,11 @@ class Diag2D(Object):
     #required dims: center (tuple/list of coords normalised 0~1)
     #               width (normalised width (float) ranging from 0~1)
     #               topleft if true span from top left to bot right, if false span from top right to bot left, default True
-    def __init__(self, ep, sh, width, center, exceed = False, topleft = True):
+    def __init__(self, name, ep, sh, width, center, exceed = False, topleft = True):
         assert len(sh) == 2, f"Diag2D only valid for 2D"
         assert len(sh) == len(center), f"wrong dimensions, grid has shape {sh} while center is {center}"
         assert all([(i >= 0 and i <= 1 for i in center)]), "Center not within grid"
-        super().__init__(ep, sh, exceed)
+        super().__init__(name, ep, sh, exceed)
         self.center = list(map(lambda size, scale: int(size * scale), sh, center))
         self.width = width * np.sqrt(sum([x ** 2 for x in sh]))
         self.topleft = topleft
@@ -157,10 +158,10 @@ class CenterRectangle(Object):
     #required dims: dims (tuple/list of normalised lengths, e.g. for 200x50 rect in 500x500 grid, len = (0.4, 0.1))
     #               center (tuple/list of coords also normalised 0~1)
     #center and dims will round down to closest grid index, object may end up smaller than expected if input is not precise
-    def __init__(self, ep, sh, dims, center, exceed = False):
+    def __init__(self, name, ep, sh, dims, center, exceed = False):
         assert len(sh) == len(center) and len(sh) == len(dims), f"wrong dimensions, grid has shape {sh} while dims is {dims} and center is {center}"
         assert all([(i >= 0 and i <= 1 for i in center)]), "Center not within grid"
-        super().__init__(ep, sh, exceed)
+        super().__init__(name, ep, sh, exceed)
         self.center = list(map(lambda size, scale: int(size * scale), sh, center))
         self.dims = list(map(lambda size, scale: size * scale, sh, dims)) #note may not be int, convert when calculating edges/edgepoints
         self._set_pos() 
@@ -211,10 +212,10 @@ class FancyRectangle2D(Object):
     #               center (tuple/list of coords also normalised 0~1)
     #               angle of rotation in radians: anticlockwise rotation from x-axis, where dims is (x,y)
     #center and dims will round down to closest grid index, object may end up smaller than expected if input is not precise
-    def __init__(self, ep, sh, dims, center, angle, exceed = False):
+    def __init__(self, name, ep, sh, dims, center, angle, exceed = False):
         assert len(sh) == len(center) and len(sh) == len(dims), f"wrong dimensions, grid has shape {sh} while dims is {dims} and center is {center}"
         assert all([(i >= 0 and i <= 1 for i in center)]), "Center not within grid"
-        super().__init__(ep, sh, exceed)
+        super().__init__(name, ep, sh, exceed)
         self.center = list(map(lambda size, scale: int(size * scale), sh, center))
         self.dims = list(map(lambda size, scale: size * scale, sh, dims)) #note may not be int, convert when calculating edges/edgepoints
         self.angle = angle
@@ -239,7 +240,7 @@ class FancyRectangle2D(Object):
 dim = 2
 xlim = [ -25.0e-4,  25.0e-4,
          -25.0e-4,  25.0e-4]
-xspacing = [500,500]
+xspacing = [9,9]
 dxs = np.array([
     (xlim[2*i+1] - xlim[2*i])/xspacing[i] for i in range(dim)
     ])
@@ -251,7 +252,7 @@ posxh = np.array([
 sh = posx.shape[1:]
 
 #Tests
-cenrec1 = CenterRectangle(1, (100,100), (0.5, 0.5), (0.5, 0.5))
+cenrec1 = CenterRectangle('cenrec1', 1, (100,100), (0.5, 0.5), (0.5, 0.5))
 assert cenrec1.edges == [(25, 75),(25, 75)], f'{cenrec1.edges}'
 assert cenrec1.edgepoints == {"topleft": (25, 75),
                             "topright": (75, 75),
@@ -260,19 +261,25 @@ assert cenrec1.edgepoints == {"topleft": (25, 75),
 assert cenrec1.is_within_grid
 # cenrec1.show()
 
-cenrec2 = CenterRectangle(1, (100,100), (1, 0.5), (0.255, 0.755), exceed = True)
+cenrec2 = CenterRectangle('cenrec2', 1,  (100,100), (1, 0.5), (0.255, 0.755), exceed = True)
 assert cenrec2.edges == [(-25, 75),(50, 100)], f'{cenrec2.edges}'
 assert not cenrec2.is_within_grid
 
-# cenrec3 = CenterRectangle(1, (11,11), (0.5, 0.5), (0.5, 0.5))
+# cenrec3 = CenterRectangle('cenrec3', 1, (11,11), (0.5, 0.5), (0.5, 0.5))
 # print(cenrec3.pos)
 # print(cenrec3.edges)
 # cenrec3.show()
 
-diag1 = Diag2D(1, (100,100), 0.05, (0.5, 0.5), topleft = False)
-print(diag1.intercepts)
-print(diag1.center)
+diag1 = Diag2D('diag1', 0.5, (10,10), 0.05, (0.5, 0.5), topleft = False)
+# print(diag1.intercepts)
+# print(diag1.center)
 assert diag1.is_within_grid
-diag1.show()
+# diag1.show()
 
+epsil = Epsil2D((10,10), 1)
+epsil.add_object(diag1)
+# epsil.show()
 
+# FIX diag2d math- the width
+# Make wall objects - init epsil with wall objects
+# Need to handle overlapping objects, overlap = True/False, true-true, false-false, true-false
