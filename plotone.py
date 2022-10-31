@@ -39,4 +39,8 @@ pc(d.T,p=dims,cmap='RdYlBu',lims=lims,log=True,linthresh=linth);
 plt.grid();
 if opts['--equal']:
     plt.axis('equal');
-plt.savefig(opts['<output>'],dpi=200);
+if opts['--show']:
+    plt.show();
+else:
+    plt.savefig(opts['<output>'],dpi=200);
+    
