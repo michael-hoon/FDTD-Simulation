@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 
 #Only changes to be made to yapic.py is to copy 'our stuff' in, initialise epsilon and mirror object finally add * epsilon behind the *dus
 #Initialise tgt with E and B dicts
@@ -37,12 +38,18 @@ class Epsil2D():
             print("Object does not exist")
 
     def _adjust_epsil(self, object, revert = False):
+        #To add feature to detect and handle overlap, objects may need attribute to allow/disallow overlap?
         if revert:
-            pass
-            #code to revert values in self.epsil according to object.pos to bgep
+            self.epsil[object.pos] = self.bgep
         else:
-            pass
-            #code to change values in self.epsil according to object.pos to object.ep
+            self.epsil[object.pos] = object.ep
+        
+    def show(self):
+        #Visualise objects
+        #Extra: option to display edgelengths/points using the object's methods???
+        plt.imshow(self.epsil, interpolation = None)
+        plt.colorbar(location = 'right')
+        plt.show()
 
 
 class Object():
@@ -52,7 +59,7 @@ class Object():
         #Additional args will be dimensions of object with values btwn 0 and 1
         #Object created with dims/size relative to grid
         self.ep = ep
-        self.pos = np.full(sh, False)
+        self.pos = np.zeros(sh, dtype = bool)
         self.exceed = exceed
 
     def _set_pos(self):
@@ -82,6 +89,13 @@ class Object():
         #Returns true if within grid
         pass
 
+    def show(self):
+        vis = np.zeros(self.pos.shape)
+        vis[self.pos] = 1
+        plt.imshow(vis, interpolation = None)
+        plt.colorbar(orientation = 'vertical')
+        plt.show()
+
 class Diag2D(Object):
     #Just create a diagonal object spanning entire grid, only 45 degrees, purely created for the mirror 
     #Is there a better way to implement using in-built numpy diag stuff instead of just iterating? I cant find a suitable func (Darren)
@@ -103,7 +117,7 @@ class Diag2D(Object):
             pass
         else:
             assert self.is_within_grid, "Object exceeds grid"
-            it = np.nditer(self.pos, flags=['multi-index'])
+            it = np.nditer(self.pos, flags=['multi_index'])
             for i in it:
                 x,y = it.multi_index
                 if self.is_within_edges(x, y):
@@ -121,7 +135,7 @@ class Diag2D(Object):
         if self.topleft:
             return (miny + minx, maxy + maxx)
         else:
-            return (miny - minx, maxy - maxx)
+            return (miny - maxx, maxy - minx)
 
     def is_within_edges(self, x, y):
         minc, maxc = self.intercepts
@@ -192,7 +206,34 @@ class CenterRectangle(Object):
                 return False
         return True
 
+class FancyRectangle2D(Object):
+    #required dims: dims (tuple/list of normalised lengths, e.g. for 200x50 rect in 500x500 grid, len = (0.4, 0.1))
+    #               center (tuple/list of coords also normalised 0~1)
+    #               angle of rotation in radians: anticlockwise rotation from x-axis, where dims is (x,y)
+    #center and dims will round down to closest grid index, object may end up smaller than expected if input is not precise
+    def __init__(self, ep, sh, dims, center, angle, exceed = False):
+        assert len(sh) == len(center) and len(sh) == len(dims), f"wrong dimensions, grid has shape {sh} while dims is {dims} and center is {center}"
+        assert all([(i >= 0 and i <= 1 for i in center)]), "Center not within grid"
+        super().__init__(ep, sh, exceed)
+        self.center = list(map(lambda size, scale: int(size * scale), sh, center))
+        self.dims = list(map(lambda size, scale: size * scale, sh, dims)) #note may not be int, convert when calculating edges/edgepoints
+        self.angle = angle
+        self._set_pos()
 
+    def _set_pos(self):
+        pass
+
+    @property
+    def edges(self):
+        pass
+
+    @property
+    def edgepoints(self):
+        pass
+
+    @property
+    def is_within_grid(self):
+        pass 
 
 #stuff copied from yapicc to setup
 dim = 2
@@ -210,18 +251,28 @@ posxh = np.array([
 sh = posx.shape[1:]
 
 #Tests
-cenrec = CenterRectangle(1, (100,100), (0.5, 0.5), (0.5, 0.5))
-assert cenrec.edges == [(25, 75),(25, 75)]
-assert cenrec.edgepoints == {"topleft": (25, 75),
+cenrec1 = CenterRectangle(1, (100,100), (0.5, 0.5), (0.5, 0.5))
+assert cenrec1.edges == [(25, 75),(25, 75)], f'{cenrec1.edges}'
+assert cenrec1.edgepoints == {"topleft": (25, 75),
                             "topright": (75, 75),
                             "botleft": (25, 25),
-                            "botright": (75, 25)}
-assert cenrec.is_within_grid
+                            "botright": (75, 25)}, f'{cenrec1.edgepoints}'
+assert cenrec1.is_within_grid
+# cenrec1.show()
 
-cenrec2 = CenterRectangle(1, (100,100), (1, 0.5), (0.255, 0.755))
-assert cenrec2.edges == [(-25, 75),(50, 100)]
+cenrec2 = CenterRectangle(1, (100,100), (1, 0.5), (0.255, 0.755), exceed = True)
+assert cenrec2.edges == [(-25, 75),(50, 100)], f'{cenrec2.edges}'
 assert not cenrec2.is_within_grid
 
-# cenrec3 = CenterRectangle(1, (11,11), (0.5, 0.5), (0.5, 0.5), exceed = False)
+# cenrec3 = CenterRectangle(1, (11,11), (0.5, 0.5), (0.5, 0.5))
 # print(cenrec3.pos)
 # print(cenrec3.edges)
+# cenrec3.show()
+
+diag1 = Diag2D(1, (100,100), 0.05, (0.5, 0.5), topleft = False)
+print(diag1.intercepts)
+print(diag1.center)
+assert diag1.is_within_grid
+diag1.show()
+
+
