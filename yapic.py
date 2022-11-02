@@ -29,8 +29,8 @@ dim  = 2
 lm      =  0.8e-4; #wavelength
 
 start_t =    0.0;
-#end_t   =   80.0e-6;
-end_t   =   40.0e-6;
+end_t   =   200.0e-6;
+# end_t   =   40.0e-6;
 dt      =   20.0e-9
 
 #laser amplitude
@@ -69,7 +69,7 @@ B['x'] = np.zeros(sh);
 B['y'] = np.zeros(sh);
 B['z'] = np.zeros(sh);
 epsil1 = Epsil2D(sh)
-epsil1.add_object(Diag2D("diag1", 1000000, sh, 0.2, (0.5,0.5), topleft = True))
+epsil1.add_object(Diag2D("diag1", 1000, sh, 0.05, (0.5,0.5), topleft = False))
 epsil1.show()
 
 def destr(d, *l):
@@ -203,10 +203,10 @@ def plot():
     plt.clf();
     plt.semilogy(posx[0]*1e4,E['y']);
     #plt.show();        
-outputs = np.arange(000,1001);
+outputs = np.arange(000, 10001, 50);
 print("starting simulation");
 for i,t in enumerate(xarange(start_t,end_t,dt)):
-    print(f"...{i}");
+    # print(f"...{i}");
     #maxwell's correction to ampere
     E['z'][ 1:-1, 1:-1] += (                                        \
         +(B['y'][ 1:-1, 1:-1] - B['y'][ 1:-1,  :-2])*dus[1]         \

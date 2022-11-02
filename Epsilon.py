@@ -5,13 +5,22 @@ import matplotlib.pyplot as plt
 #Only changes to be made to yapic.py is to copy 'our stuff' in, initialise epsilon and mirror object finally add * epsilon behind the *dus
 #Initialise tgt with E and B dicts
 
+#TO BE IMPLEMENTED
+# feature to handle overlapping objects, overlap = True/False, true-true, false-false, true-false
+# feature to handle objects that exceed the grid, an alt set_pos that cuts off
+# Fancy rectangle
+
 #our stuff
 class Epsil2D():
-    def __init__(self, sh, bgep = 1):
+    def __init__(self, sh, bgep = 1, boundary = True):
         #Takes in shape(dimens) of grid and background epsil value (air)
+        #Boundary if true will fix all edge values at 1 regardless of any object added, if false will initially set at bgep and be affected by objects added 
         self._objects = {}
         self.bgep = 1
-        self.epsil = np.full(sh, self.bgep, dtype = float) 
+        self.boundary = boundary
+        self.epsil = np.full(sh, self.bgep, dtype = float)
+        if self.boundary:
+            self.set_bounds() 
 
     @property
     def objects(self):
@@ -43,6 +52,15 @@ class Epsil2D():
             self.epsil[object.pos] = self.bgep
         else:
             self.epsil[object.pos] = object.ep
+        if self.boundary:
+            self.set_bounds()
+
+    def set_bounds(self, ep = 1):
+        #Can also be called after all objects added to set at different ep val if needed
+        self.epsil[0, :] = ep
+        self.epsil[-1, :] = ep
+        self.epsil[:, 0] = ep
+        self.epsil[:, -1] = ep
         
     def show(self):
         #Visualise objects
@@ -50,7 +68,6 @@ class Epsil2D():
         plt.imshow(self.epsil, interpolation = None)
         plt.colorbar(location = 'right')
         plt.show()
-
 
 class Object():
     def __init__(self, name, ep, sh, exceed = False):
@@ -109,7 +126,7 @@ class Diag2D(Object):
         assert all([(i >= 0 and i <= 1 for i in center)]), "Center not within grid"
         super().__init__(name, ep, sh, exceed)
         self.center = list(map(lambda size, scale: int(size * scale), sh, center))
-        self.width = width * np.sqrt(sum([x ** 2 for x in sh]))
+        self.width = width * np.sqrt(sum([x ** 2 for x in sh])) / 2
         self.topleft = topleft
         self._set_pos()
 
@@ -240,7 +257,7 @@ class FancyRectangle2D(Object):
 dim = 2
 xlim = [ -25.0e-4,  25.0e-4,
          -25.0e-4,  25.0e-4]
-xspacing = [9,9]
+xspacing = [500,500]
 dxs = np.array([
     (xlim[2*i+1] - xlim[2*i])/xspacing[i] for i in range(dim)
     ])
@@ -270,16 +287,12 @@ assert not cenrec2.is_within_grid
 # print(cenrec3.edges)
 # cenrec3.show()
 
-diag1 = Diag2D('diag1', 0.5, (10,10), 0.05, (0.5, 0.5), topleft = False)
+diag1 = Diag2D('diag1', 0.5, sh, 0.05, (0.5, 0.5), topleft = True)
 # print(diag1.intercepts)
 # print(diag1.center)
 assert diag1.is_within_grid
 # diag1.show()
 
-epsil = Epsil2D((10,10), 1)
+epsil = Epsil2D(sh, 1)
 epsil.add_object(diag1)
 # epsil.show()
-
-# FIX diag2d math- the width
-# Make wall objects - init epsil with wall objects
-# Need to handle overlapping objects, overlap = True/False, true-true, false-false, true-false
