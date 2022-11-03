@@ -69,7 +69,7 @@ B['x'] = np.zeros(sh);
 B['y'] = np.zeros(sh);
 B['z'] = np.zeros(sh);
 epsil1 = Epsil2D(sh)
-epsil1.add_object(Diag2D("diag1", 1000, sh, 0.05, (0.5,0.5), topleft = False))
+epsil1.add_object(Diag2D("diag1", 10, sh, 0.05, (0.5,0.5), topleft = False))
 epsil1.show()
 
 def destr(d, *l):
@@ -210,9 +210,9 @@ for i,t in enumerate(xarange(start_t,end_t,dt)):
     #maxwell's correction to ampere
     E['z'][ 1:-1, 1:-1] += (                                        \
         +(B['y'][ 1:-1, 1:-1] - B['y'][ 1:-1,  :-2])*dus[1]         \
-        -(B['x'][ 1:-1, 1:-1] - B['x'][  :-2, 1:-1])*dus[0]) * epsil1.epsil[ 1:-1, 1:-1];
-    E['y'][  :  , 1:-1] += -((B['z'][  :  , 1:-1]-B['z'][  :  ,  :-2])*dus[1]) * epsil1.epsil[:, 1:-1]
-    E['x'][ 1:-1,  :  ] +=  ((B['z'][ 1:-1,  :  ]-B['z'][  :-2,  :  ])*dus[0]) * epsil1.epsil[ 1:-1,:]
+        -(B['x'][ 1:-1, 1:-1] - B['x'][  :-2, 1:-1])*dus[0]) / epsil1.epsil[ 1:-1, 1:-1];
+    E['y'][  :  , 1:-1] += -((B['z'][  :  , 1:-1]-B['z'][  :  ,  :-2])*dus[1]) / epsil1.epsil[:, 1:-1]
+    E['x'][ 1:-1,  :  ] +=  ((B['z'][ 1:-1,  :  ]-B['z'][  :-2,  :  ])*dus[0]) / epsil1.epsil[ 1:-1,:]
 
     #E boundary condition
     current_edge = sincol2d(t,width,sindat);
@@ -227,9 +227,9 @@ for i,t in enumerate(xarange(start_t,end_t,dt)):
     #maxwell, faraday
     B['z'][  :-1,  :-1] -= (
         +(E['y'][  :-1, 1:  ] - E['y'][  :-1,  :-1])*dus[1]
-        -(E['x'][ 1:  ,  :-1] - E['x'][  :-1,  :-1])*dus[0]) * epsil1.epsil[  :-1,  :-1];
-    B['y'][  :  ,  :-1] -= ((E['z'][  :  , 1:  ]-E['z'][  :  ,  :-1])*dus[0]) * epsil1.epsil[  :  ,  :-1];
-    B['x'][  :-1,  :  ] -= ((E['z'][ 1:  ,  :  ]-E['z'][  :-1,  :  ])*dus[1]) * epsil1.epsil[  :-1,  :  ];
+        -(E['x'][ 1:  ,  :-1] - E['x'][  :-1,  :-1])*dus[0]);
+    B['y'][  :  ,  :-1] -= ((E['z'][  :  , 1:  ]-E['z'][  :  ,  :-1])*dus[0]);
+    B['x'][  :-1,  :  ] -= ((E['z'][ 1:  ,  :  ]-E['z'][  :-1,  :  ])*dus[1]);
     #implicitly left to zero
 
     if i in outputs:
