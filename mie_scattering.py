@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-
 import meep as mp
 
 #Setting up initial conds
@@ -19,7 +17,7 @@ s = dair + 2*dpml
 cell_size = mp.Vector3(s, s)
 resolution = 50
 pml_layers = [mp.PML(thickness=dpml)]
-symmetries = [mp.Mirror(mp.Y), mp.Mirror(mp.Z, phase=-1)] #Phase = -1 is odd mirror? Do we need this?
+# symmetries = [mp.Mirror(mp.Y), mp.Mirror(mp.Z, phase = -1)] #Phase = -1 is odd mirror? Do we need this?
 
 #Setting up simulation
 
@@ -52,15 +50,26 @@ sim = mp.Simulation(
     boundary_layers=pml_layers,
     sources=sources,
     k_point=mp.Vector3(),
-    symmetries=symmetries,
+    # symmetries=symmetries,
     geometry=geometry,
 )
 
+def output(sim, todo):
+    if todo == 'step':
+        time = sim.meep_time()
+        slice = sim.get_array(component = mp.Ex, center = (0,0,0), size = cell_size)
+        # plt.imshow(slice)
+        # plt.savefig(f'{time}.png')
+        # plt.colorbar()
+        # plt.clf()
+    if todo == 'finish':
+        pass
+
 #Run Simulation and obtain data
-sim.use_output_directory() #output all to default directory mie_scattering-out/
+# sim.use_output_directory() #output all to default directory mie_scattering-out/
+plt.figure()
 sim.run(
-    mp.to_appended("efield_x", mp.at_every(1, mp.output_efield_x)),
-    # mp.to_appended("b_field", mp.at_every(1, mp.output_bfield)),
+    mp.at_every(1, output),
+    # mp.to_appended("efield_x", mp.at_every(1, mp.output_efield_x)),
     until=50)
 
-# os.system("convert mie_scattering-out/ez.t*.png ez.gif")
