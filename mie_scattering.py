@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 import meep as mp
 
@@ -56,6 +57,10 @@ sim = mp.Simulation(
 )
 
 #Run Simulation and obtain data
-sim.run(until_after_sources=100)
+sim.use_output_directory() #output all to default directory mie_scattering-out/
+sim.run(
+    mp.to_appended("efield_x", mp.at_every(1, mp.output_efield_x)),
+    # mp.to_appended("b_field", mp.at_every(1, mp.output_bfield)),
+    until=50)
 
-
+# os.system("convert mie_scattering-out/ez.t*.png ez.gif")
