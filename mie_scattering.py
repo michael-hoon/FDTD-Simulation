@@ -28,10 +28,11 @@ sources = [
     mp.GaussianBeamSource(
         mp.GaussianSource(wavelength = wvl, width = t_width,cutoff = t_width * 2,is_integrated = True),
         center = mp.Vector3(-dair/2, 0), 
-        size = mp.Vector3(0, s/2), #line of y = -dair/2 (vert line through entire box)
+        size = mp.Vector3(0, s), #line of y = -dair/2 (vert line through entire box)
         beam_x0 = mp.Vector3(dair/2, 0), #Focus at center of box
         beam_kdir = mp.Vector3(1, 0), #pos x dir
         beam_w0 = 2.0 * wvl * fnumber / np.pi, #spatial width
+        beam_E0 = mp.Vector3(0, 0, 1)
     )]
 
 #create silicon sphere at center
@@ -50,27 +51,28 @@ sim = mp.Simulation(
     boundary_layers=pml_layers,
     sources=sources,
     k_point=mp.Vector3(),
-    # symmetries=symmetries,
+    symmetries=symmetries,
     geometry=geometry,
 )
 
-def output(sim, todo):
-    if todo == 'step':
-        time = sim.meep_time()
-        slice = sim.get_array(component = mp.Ex, center = (0,0,0), size = cell_size)
+# def output(sim, todo):
+#     if todo == 'step':
+#         time = sim.meep_time()
+#         slice = sim.get_array(component = mp.Ex, center = (0,0,0), size = cell_size)
         # plt.imshow(slice)
         # plt.savefig(f'{time}.png')
         # plt.colorbar()
         # plt.clf()
-    if todo == 'finish':
-        pass
+    # if todo == 'finish':
+    #     pass
 
 #Run Simulation and obtain data
 sim.use_output_directory() #output all to default directory mie_scattering-out/
 plt.figure()
 sim.run(
+    mp.at_beginning(mp.output_epsilon),
     # mp.at_every(1, output),
-    # mp.to_appended("efield_x", mp.at_every(1, mp.output_efield_x)),
-    mp.at_every(1, mp.output_png(mp.Ex, "-Zc /home/draco/miniconda3/envs/h5/share/h5utils/colormaps/dkbluered")),
-    until=50)
+    # mp.to_appended("efield_z", mp.at_every(1, mp.output_efield_z)),
+    mp.at_every(1, mp.output_png(mp.Ez, "-Zc /home/draco/miniconda3/envs/mp/share/h5utils/colormaps/dkbluered -C $EPS")),
+    until=60)
 
