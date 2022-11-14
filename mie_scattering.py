@@ -17,8 +17,7 @@ s = dair + 2*dpml
 cell_size = mp.Vector3(s, s)
 resolution = 50
 pml_layers = [mp.PML(thickness=dpml)]
-symmetries = [mp.Mirror(mp.Y)] #mp.Mirror(mp.Z, phase = -1)] #Phase = -1 is odd mirror? Do we need this?
-
+symmetries = [mp.Mirror(mp.Y)] #???
 #Setting up simulation
 
 #For wvl in wvl:
@@ -37,10 +36,8 @@ sources = [
 
 #create silicon sphere at center
 r = 1.0
-peak = 0.354241
-gamma = 5.42347
-sigma = 460.149
-material = mp.Medium(index = 2) #to model lorentzian resonance
+lorentz_suscep = [mp.LorentzianSusceptibility(frequency = 0.354241, gamma = 5.42347, sigma = 460.149)]
+material = mp.Medium(epsilon = 11.7, E_susceptibilities = lorentz_suscep)
 geometry = [
     mp.Sphere(material=material, center=mp.Vector3(), radius=r)
 ]
@@ -67,7 +64,7 @@ sim = mp.Simulation(
     #     pass
 
 #Run Simulation and obtain data
-sim.use_output_directory() #output all to default directory mie_scattering-out/
+sim.use_output_directory("Test") #output all to default directory mie_scattering-out/
 plt.figure()
 sim.run(
     mp.at_beginning(mp.output_epsilon),
