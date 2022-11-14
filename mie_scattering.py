@@ -17,7 +17,7 @@ s = dair + 2*dpml
 cell_size = mp.Vector3(s, s)
 resolution = 50
 pml_layers = [mp.PML(thickness=dpml)]
-# symmetries = [mp.Mirror(mp.Y), mp.Mirror(mp.Z, phase = -1)] #Phase = -1 is odd mirror? Do we need this?
+symmetries = [mp.Mirror(mp.Y)] #mp.Mirror(mp.Z, phase = -1)] #Phase = -1 is odd mirror? Do we need this?
 
 #Setting up simulation
 
@@ -66,10 +66,11 @@ def output(sim, todo):
         pass
 
 #Run Simulation and obtain data
-# sim.use_output_directory() #output all to default directory mie_scattering-out/
+sim.use_output_directory() #output all to default directory mie_scattering-out/
 plt.figure()
 sim.run(
-    mp.at_every(1, output),
+    # mp.at_every(1, output),
     # mp.to_appended("efield_x", mp.at_every(1, mp.output_efield_x)),
+    mp.at_every(1, mp.output_png(mp.Ex, "-Zc /home/draco/miniconda3/envs/h5/share/h5utils/colormaps/dkbluered")),
     until=50)
 
