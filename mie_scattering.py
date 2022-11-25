@@ -36,8 +36,8 @@ for w in wvl:
 
     #create silicon sphere at center
     r = 1.0
-    lorentz_suscep = [mp.LorentzianSusceptibility(frequency = 0.354241, gamma = 5.42347, sigma = 2.37226548)]
-    material = mp.Medium(epsilon = 11.7, E_susceptibilities = lorentz_suscep)
+    lorentz_suscep = [mp.LorentzianSusceptibility(frequency = 1/0.354241, gamma = 1/5.42347, sigma = 2.37226548)]
+    material = mp.Medium(epsilon = 1.0001, E_susceptibilities = lorentz_suscep)
     geometry = [
         mp.Sphere(material=material, center=mp.Vector3(), radius=r)
     ]
