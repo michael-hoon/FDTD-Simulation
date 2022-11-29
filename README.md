@@ -2,7 +2,7 @@
 ![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/Timelapse.gif)
 
 # Mie Scattering of Silicon, 600nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering-0.60.gif)
+![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering_0.60.gif)
 
 # Mie Scattering of Silicon, 500nm 
 ![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering_0.50.gif)
