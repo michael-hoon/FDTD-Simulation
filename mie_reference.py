@@ -181,20 +181,16 @@ scatt_eff_meep = scatt_cross_section * -1 / (np.pi * r**2)
 #     ps.MieQ(n_sphere, 1000 / f, 2 * r * 1000, asDict=True)["Qsca"] for f in freqs
 # ]
 
-print(scatt_flux.shape)
-print(intensity.shape)
-print(scatt_cross_section.shape)
-
-# if mp.am_master():
-#     plt.figure(dpi=150)
-#     plt.loglog(2 * np.pi * r * np.asarray(freqs), scatt_eff_meep, "bo-", label="Meep")
-#     plt.loglog(
-#         2 * np.pi * r * np.asarray(freqs), scatt_eff_theory, "ro-", label="theory"
-#     )
-#     plt.grid(True, which="both", ls="-")
-#     plt.xlabel("(sphere circumference)/wavelength, 2πr/λ")
-#     plt.ylabel("scattering efficiency, σ/πr$^{2}$")
-#     plt.legend(loc="upper right")
-#     plt.title("Mie Scattering of a Lossless Dielectric Sphere")
-#     plt.tight_layout()
-#     plt.savefig("mie_scattering.png")
+if mp.am_master():
+    plt.figure(dpi=150)
+    plt.loglog(2 * np.pi * r * np.asarray(freqs), scatt_eff_meep, "bo-", label="Meep")
+    plt.loglog(
+        2 * np.pi * r * np.asarray(freqs), scatt_eff_theory, "ro-", label="theory"
+    )
+    plt.grid(True, which="both", ls="-")
+    plt.xlabel("(sphere circumference)/wavelength, 2πr/λ")
+    plt.ylabel("scattering efficiency, σ/πr$^{2}$")
+    plt.legend(loc="upper right")
+    plt.title("Mie Scattering of a Lossless Dielectric Sphere")
+    plt.tight_layout()
+    plt.savefig("mie_scattering.png")
