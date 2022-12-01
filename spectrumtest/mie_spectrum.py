@@ -3,7 +3,7 @@ import numpy as np
 import meep as mp
 
 # wvls = [0.6,0.5,0.45,0.4,0.35];
-wvls = [0.35]
+wvls = [0.35, 0.45, 0.55]
 
 # basically, 4.5 is the full-width-half-maximum intensity. See the gaussian
 # beam on wiki. To convert, divide by the given factor and an extra sqrt(2),
@@ -27,6 +27,7 @@ cell_size = mp.Vector3(s, s);
 resolution = 50
 pml_layers = [mp.PML(thickness=dpml)]
 
+energy = {}
 #loop over wavelengths
 for w in wvls:
     # is_integrated=True necessary for any planewave source extending into PML
@@ -62,42 +63,21 @@ for w in wvls:
         k_point=mp.Vector3(),
     )
 
-    line_x1 = sim.add_energy(
+    box = sim.add_energy(
         frq_cen,
         dfrq,
         nfrq,
-        mp.EnergyRegion(center = mp.Vector3(x = -r), size = mp.Vector3(0, 2 * r))
-    )
-
-    line_x2 = sim.add_energy(
-        frq_cen,
-        dfrq,
-        nfrq,
-        mp.EnergyRegion(center = mp.Vector3(x = +r), size = mp.Vector3(0, 2 * r))
-    )
-
-    line_y1 = sim.add_energy(
-        frq_cen,
-        dfrq,
-        nfrq,
-        mp.EnergyRegion(center = mp.Vector3(y = -r), size = mp.Vector3(2 * r, 0))
-    )
-
-    line_y2 = sim.add_energy(
-        frq_cen,
-        dfrq,
-        nfrq,
-        mp.EnergyRegion(center = mp.Vector3(y = -r), size = mp.Vector3(2 * r, 0))
-    )
+        mp.EnergyRegion(center = mp.Vector3(x = -r), size = mp.Vector3(0, 2 * r), weight = -1.0),
+        mp.EnergyRegion(center = mp.Vector3(x = +r), size = mp.Vector3(0, 2 * r)),
+        mp.EnergyRegion(center = mp.Vector3(y = -r), size = mp.Vector3(2 * r, 0), weight = -1.0),
+        mp.EnergyRegion(center = mp.Vector3(y = +r), size = mp.Vector3(2 * r, 0)))
 
     sim.run(
+        # mp.at_every(1, mp.output_png(mp.Ey, "-Zc /home/draco/miniconda3/envs/mp/share/h5utils/colormaps/dkbluered -C $EPS")),
         until=30)
 
-    freqs = mp.get_energy_freqs(line_x1)
-    sim.save_energy('line_x1', line_x1)
-    sim.save_energy('line_x2', line_x2)
-    sim.save_energy('line_y1', line_y1)
-    sim.save_energy('line_y2', line_y2)
+    freqs = mp.get_energy_freqs(box)
+    sim.save_energy('box', box)
 
     sim.reset_meep()
 
@@ -110,38 +90,16 @@ for w in wvls:
         geometry=geometry,
     )
 
-    line_x1 = sim.add_energy(
+    box1 = sim.add_energy(
         frq_cen,
         dfrq,
         nfrq,
-        mp.EnergyRegion(center = mp.Vector3(x = -r), size = mp.Vector3(0, 2 * r))
-    )
+        mp.EnergyRegion(center = mp.Vector3(x = -r), size = mp.Vector3(0, 2 * r), weight = -1.0),
+        mp.EnergyRegion(center = mp.Vector3(x = +r), size = mp.Vector3(0, 2 * r)),
+        mp.EnergyRegion(center = mp.Vector3(y = -r), size = mp.Vector3(2 * r, 0), weight = -1.0),
+        mp.EnergyRegion(center = mp.Vector3(y = +r), size = mp.Vector3(2 * r, 0)))
 
-    line_x2 = sim.add_energy(
-        frq_cen,
-        dfrq,
-        nfrq,
-        mp.EnergyRegion(center = mp.Vector3(x = +r), size = mp.Vector3(0, 2 * r))
-    )
-
-    line_y1 = sim.add_energy(
-        frq_cen,
-        dfrq,
-        nfrq,
-        mp.EnergyRegion(center = mp.Vector3(y = -r), size = mp.Vector3(2 * r, 0))
-    )
-
-    line_y2 = sim.add_energy(
-        frq_cen,
-        dfrq,
-        nfrq,
-        mp.EnergyRegion(center = mp.Vector3(y = -r), size = mp.Vector3(2 * r, 0))
-    )
-
-    sim.load_minus_energy('line_x1', line_x1)
-    sim.load_minus_energy('line_x2', line_x2)
-    sim.load_minus_energy('line_y1', line_y1)
-    sim.load_minus_energy('line_y2', line_y2)
+    sim.load_minus_energy('box', box1)
 
     # sim.use_output_directory("spectrumtest")
     sim.run(
@@ -149,24 +107,14 @@ for w in wvls:
         # mp.at_every(1, mp.output_png(mp.Ey, "-Zc /home/draco/miniconda3/envs/mp/share/h5utils/colormaps/dkbluered -C $EPS")),
         until=30)
 
-    line_x1_energy = mp.get_total_energy(line_x1)
-    line_x2_energy = mp.get_total_energy(line_x2)
-    line_y1_energy = mp.get_total_energy(line_y1)
-    line_y2_energy = mp.get_total_energy(line_y2)
-
-    total_energy = (
-        - np.asarray(line_x1_energy)
-        + np.asarray(line_x2_energy)
-        - np.asarray(line_y1_energy)
-        + np.asarray(line_y2_energy))
-    # total_energy = total_energy / total_energy.max()
-    wavelengths = 1 / np.asarray(freqs)
+    box1_energy = mp.get_total_energy(box1)
 
     plt.figure()
-    plt.plot(wavelengths, total_energy, "bo-", label = "350nm")
+    plt.plot(freqs, box1_energy, label = f"{w*1000}nm")
     plt.grid(True, which="both", ls="-")
-    plt.xlabel("Wavelength")
+    plt.xlabel("Frequency")
     plt.ylabel("Energy")
     plt.legend(loc="upper right")
-    plt.title("Test")
-    plt.savefig("spectrumtest.png")
+    plt.title(f"spectrum_{w}")
+    plt.savefig(f"spectrum_{w}.png")
+
