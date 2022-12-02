@@ -36,9 +36,10 @@ for w in wvl:
     #create silicon sphere at center
     r = 1.0
     lorentz_suscep = [
-        # mp.LorentzianSusceptibility(frequency = 1/0.354241, gamma = 1/5.42347, sigma = 2.37226548),
-        mp.LorentzianSusceptibility(frequency = 1/0.354241, gamma = 1/5.42347, sigma = 1.61254),
-        mp.LorentzianSusceptibility(frequency = 1/0.29173, gamma = 1/1.180, sigma = 10.1351)]
+        mp.LorentzianSusceptibility(frequency = 1/0.354241, gamma = 1/5.42347, sigma = 2.37226548)
+        # mp.LorentzianSusceptibility(frequency = 1/0.354241, gamma = 1/5.42347, sigma = 1.61254),
+        # mp.LorentzianSusceptibility(frequency = 1/0.29173, gamma = 1/1.180, sigma = 10.1351)
+        ]
     material = mp.Medium(epsilon = 1.0001, E_susceptibilities = lorentz_suscep)
     geometry = [
         mp.Sphere(material=material, center=mp.Vector3(), radius=r)
@@ -54,11 +55,11 @@ for w in wvl:
     )
 
     #Run Simulation and obtain data
-    sim.use_output_directory(f"2PeakTest_{w}") #output all to default directory mie_scattering-out/
+    sim.use_output_directory(f"Test2_{w}") #output all to default directory mie_scattering-out/
     sim.run(
         mp.at_beginning(mp.output_epsilon),
-        # mp.to_appended("efield_z", mp.at_every(1, mp.output_efield_z)),
+        # mp.to_appended(f"efield_z_{w}", mp.at_every(1, mp.output_efield_z)),
         # mp.at_every(1, mp.output_png(mp.Ez, "-Zc /home/maikuhl/.conda/envs/mp/share/h5utils/colormaps/dkbluered -C $EPS")), #Using h5topng --help to find path due to problem with h5utils that is compatible with meep
-        mp.at_every(1, mp.output_png(mp.Ez, "-Zc /home/draco/miniconda3/envs/mp/share/h5utils/colormaps/dkbluered -C $EPS")),
+        mp.at_every(1, mp.output_png(mp.Ez, "-Zc /home/draco/miniconda3/envs/mp/share/h5utils/colormaps/dkblueredcustom -C $EPS")),
         until=60)
 
