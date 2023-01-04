@@ -1,32 +1,36 @@
-# FDTD-Simulation
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/Timelapse.gif)
+# Working with Finite Difference Time Domain for Electromagnetic Simulation
+Computational Modelling and comparisons between Particle in Cell (PIC - Epoch) and Meep simulations.
 
-# Mie Scattering of Silicon, 600nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering_0.60.gif)
+# Documentation
+Refer to [MEEP](https://meep.readthedocs.io/en/latest/Introduction/) and [Epoch](https://epochpic.github.io/documentation.html) documentation for installation. 
+MEEP requires Linux to run: use WSL if on Windows-based systems. 
 
-# Mie Scattering of Silicon, 500nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering_0.50.gif)
+# Results
 
-# Mie Scattering of Silicon, 450nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering_0.45.gif)
+## Initial Testing
 
-# Mie Scattering of Silicon, 400nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering_0.40.gif)
+### Initial Timelapse Simulation
+![https://github.com/Maikuhl/FDTD-Simulation/blob/main/Initial_Simulations/Timelapse.gif]
 
-# Mie Scattering of Silicon, 350nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/mie_scattering_0.35.gif)
+## Results
 
-# 2 peak test, 600nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/2peak_0.60.gif)
+### PIC Simulation, 250nm
+![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.25.gif]
 
-# 2 peak test, 500nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/2peak_0.50.gif)
+### PIC Simulation, 350nm
+![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.35.gif]
 
-# 2 peak test, 450nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/2peak_0.45.gif)
+### PIC Simulation, 600nm
+![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.60.gif]
 
-# 2 peak test, 400nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/2peak_0.40.gif)
+### MEEP Simulation, 250nm
+![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.25.gif]
 
-# 2 peak test, 350nm 
-![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/2peak_0.35.gif)
+### MEEP Simulation, 350nm
+![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.35.gif]
+
+### MEEP Simulation, 600nm
+![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.60.gif]
+
+# Final Poster
+![]
