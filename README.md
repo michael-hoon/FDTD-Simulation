@@ -10,27 +10,27 @@ MEEP requires Linux to run: use WSL if on Windows-based systems.
 ## Initial Testing
 
 ### Initial Timelapse Simulation
-![https://github.com/Maikuhl/FDTD-Simulation/blob/main/Initial_Simulations/Timelapse.gif]
+![](https://github.com/Maikuhl/FDTD-Simulation/blob/main/Initial_Simulations/Timelapse.gif)
 
 ## Results
 
 ### PIC Simulation, 250nm
-![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.25.gif]
+![250nm](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.25.gif)
 
 ### PIC Simulation, 350nm
-![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.35.gif]
+![350nm](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.35.gif)
 
 ### PIC Simulation, 600nm
-![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.60.gif]
+![600nm](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/pic-0.60.gif)
 
 ### MEEP Simulation, 250nm
-![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.25.gif]
+![250nm](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.25.gif)
 
 ### MEEP Simulation, 350nm
-![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.35.gif]
+![350nm](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.35.gif)
 
 ### MEEP Simulation, 600nm
-![https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.60.gif]
+![600nm](https://github.com/Maikuhl/FDTD-Simulation/blob/main/All%20gifs/meep-0.60.gif)
 
 # Final Poster
-![]
+!()[]
