@@ -1,5 +1,5 @@
 # Working with Finite Difference Time Domain for Electromagnetic Simulation
-Computational Modelling and comparisons between Particle in Cell (PIC - Epoch) and MEEP simulations.
+Computational Modelling and comparisons between Particle in Cell (PIC - Epoch) and MEEP (FDTD) simulations.
 
 # Documentation
 Refer to [MEEP](https://meep.readthedocs.io/en/latest/Introduction/) and [Epoch](https://epochpic.github.io/documentation.html) documentation for installation. 
